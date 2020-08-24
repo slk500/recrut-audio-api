@@ -54,6 +54,29 @@ class ApiTest extends WebTestCase
     }
 
     /**
+     * @covers CatalogController::delete
+     */
+    public function test_remove_product_from_the_catalog()
+    {
+        $catalog = new Catalog();
+        $product = new Product(
+            'product 1',
+            100
+        );
+        $this->entityManager->persist($product);
+        $this->entityManager->persist($catalog);
+        $catalog->add($product);
+        $this->entityManager->flush();
+
+        $this->client->request('DELETE', "/catalogs/{$catalog->getId()}/products/{$product->getId()}");
+
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+        $this->entityManager->refresh($catalog);
+        $this->assertEmpty($catalog->getProducts());
+    }
+
+
+    /**
      * @covers ProductController::update
      */
     public function test_update_product_name()
@@ -66,16 +89,59 @@ class ApiTest extends WebTestCase
         $this->entityManager->flush();
 
         $newProductName = 'new product name';
-        $this->client->request('PATCH', "/products/{$product->getId()}",
-            ['name' => $newProductName]
+        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'name'=> $newProductName
+        ]));
+
+
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+
+        $this->entityManager->refresh($product);
+        $this->assertSame($product->getName(), $newProductName);
+    }
+
+    /**
+     * @covers ProductController::update
+     */
+    public function test_update_product_price()
+    {
+        $product = new Product(
+            'product 1',
+            100
         );
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
 
-        $x = $this->client->getResponse()->getContent();
+        $newProductPrice = 200;
+        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'price' => $newProductPrice
+        ]));
 
-        $productFromDatabase = $this->entityManager
-            ->getRepository(Product::class)
-            ->findOneBy(['name' => $newProductName]);
-        $this->assertSame($productFromDatabase->getName(), $newProductName);
+
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+        $this->entityManager->refresh($product);
+        $this->assertSame($product->getPrice(), $newProductPrice);
+    }
+
+    public function test_list_all_products_in_the_catalog_as_a_paginated_list_with_at_most_3_products_per_page()
+    {
+        $this->markTestSkipped('to do');
+    }
+
+    public function test_create_a_cart()
+    {
+        $this->client->request('POST', "/carts");
+
+        $this->assertSame(201, $this->client->getResponse()->getStatusCode());
+
+        $carts = $this->entityManager->getRepository(Cart::class)->findAll();
+        $this->assertNotEmpty($carts);
     }
 
     public function test_list_all_products_in_the_cart()

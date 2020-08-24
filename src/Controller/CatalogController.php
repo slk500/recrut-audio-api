@@ -35,10 +35,11 @@ class CatalogController extends AbstractController
     }
 
     /**
-     * @Route("catalogs/{catalog_id}/products/{product_id}", methods={"DELETE"})
+     * @Route("catalogs/{catalog}/products/{product}", methods={"DELETE"})
      */
-    public function delete(Catalog $catalog, Product $product)
+    public function delete(Catalog $catalog, Product $product, EntityManagerInterface $entityManager)
     {
         $catalog->remove($product);
+        $entityManager->flush();
     }
 }

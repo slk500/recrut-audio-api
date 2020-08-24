@@ -47,7 +47,7 @@ class ControllerEventSubscriber implements EventSubscriberInterface
         if ('POST' === $method) {
             return 201;
         }
-        if ('DELETE' === $method) {
+        if ('DELETE' === $method || 'PATCH' === $method) {
             return 204;
         }
 

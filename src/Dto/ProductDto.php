@@ -15,4 +15,14 @@ class ProductDto
     {
         return new Product($this->name, $this->price);
     }
+
+    public static function fromEntity(Product $product)
+    {
+        $self = new self();
+
+        $self->name = $product->getName();
+        $self->price = $product->getPrice();
+
+        return $self;
+    }
 }
