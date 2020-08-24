@@ -40,9 +40,17 @@ class ApiTest extends WebTestCase
         $this->entityManager->persist($catalog);
         $this->entityManager->flush();
 
-        $this->client->request('PATCH', "/catalogs/{$catalog->getId()}",
-            ['name' => $newProductName]
-        );
+        $this->client->request('POST', "/catalogs/{$catalog->getId()}/products", [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'name'=> 'product 1',
+            'price' => 100
+        ]));
+
+        $this->assertSame(201, $this->client->getResponse()->getStatusCode());
+        $this->entityManager->refresh($catalog);
+        $this->assertNotEmpty($catalog->getProducts());
     }
 
     /**

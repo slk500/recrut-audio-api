@@ -21,7 +21,7 @@ class UnitTest extends TestCase
 
         $catalog->add($product);
 
-        $this->assertFalse($catalog->isEmpty());
+        $this->assertFalse($catalog->getProducts()->isEmpty());
     }
 
     public function test_remove_product_from_the_catalog()
@@ -33,10 +33,10 @@ class UnitTest extends TestCase
         );
 
         $catalog->add($product);
-        $this->assertFalse($catalog->isEmpty());
+        $this->assertFalse($catalog->getProducts()->isEmpty());
 
         $catalog->remove($product);
-        $this->assertTrue($catalog->isEmpty());
+        $this->assertTrue($catalog->getProducts()->isEmpty());
     }
 
     public function test_update_product_name()

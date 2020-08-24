@@ -4,19 +4,36 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity
+ */
 class Catalog
 {
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     */
     private int $id;
 
     /**
-     * @var Product[]
+     * @var Collection&Product[]
+     * @ORM\ManyToMany(targetEntity="App\Entity\Product")
      */
-    private array $products;
+    private Collection $products;
 
-    public function __construct(Product ...$products)
+    public function __construct()
     {
-        $this->products = $products;
+        $this->products = new ArrayCollection();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function add(Product $product): void
@@ -26,13 +43,18 @@ class Catalog
 
     public function remove(Product $product): void
     {
-        $this->products = array_filter($this->products,
-            fn(Product $productInCatalog) => ($product != $productInCatalog)
-        );
+        if (!$this->products->contains($product)) {
+            return;
+        }
+
+        $this->products->removeElement($product);
     }
 
-    public function isEmpty(): bool
+    /**
+     * @return Collection&Product[]
+     */
+    public function getProducts(): Collection
     {
-        return empty($this->products);
+        return $this->products;
     }
 }

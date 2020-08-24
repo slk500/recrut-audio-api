@@ -14,7 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Cart
 {
     /**
-     * @var int
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
