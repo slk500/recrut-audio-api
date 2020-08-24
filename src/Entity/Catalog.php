@@ -7,6 +7,8 @@ namespace App\Entity;
 
 class Catalog
 {
+    private int $id;
+
     /**
      * @var Product[]
      */

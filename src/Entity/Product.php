@@ -4,16 +4,31 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 
-use App\ValueObject\Money;
-
+/**
+ * @ORM\Entity
+ */
 class Product
 {
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private int $id;
+
+    /**
+     * @ORM\Column(type="string")
+     */
     private string $name;
 
-    private Money $price;
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $price;
 
-    public function __construct(string $name, Money $price)
+    public function __construct(string $name, int $price)
     {
         $this->name = $name;
         $this->price = $price;
@@ -24,7 +39,7 @@ class Product
         return $this->name;
     }
 
-    public function getPrice(): Money
+    public function getPrice(): int
     {
         return $this->price;
     }
@@ -34,8 +49,13 @@ class Product
         $this->name = $name;
     }
 
-    public function setPrice(Money $price): void
+    public function setPrice(int $price): void
     {
         $this->price = $price;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }
