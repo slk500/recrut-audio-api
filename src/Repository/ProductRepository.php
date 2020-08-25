@@ -4,6 +4,7 @@
 namespace App\Repository;
 
 
+use App\Dto\ProductDto;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,13 +23,22 @@ class ProductRepository
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $entityManager->getRepository(ProductRepository::class);
+        $this->repository = $entityManager->getRepository(Product::class);
         $this->entityManager = $entityManager;
     }
 
-    public function find(int $id): Product
+    public function add(Product $product)
     {
-        return $this->repository->find($id);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+    }
+
+    public function update(Product $product, ProductDto $productDto)
+    {
+        $product->setName($productDto->name);
+        $product->setPrice($productDto->price);
+
+        $this->entityManager->flush();
     }
 
 }
