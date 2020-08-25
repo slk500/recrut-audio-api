@@ -6,39 +6,33 @@ namespace App\Controller;
 
 use App\Entity\Cart;
 use App\Entity\Product;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\CartRepository;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CartController
+final class CartController
 {
     /**
      * @Route("carts", methods={"POST"})
      */
-    public function create(EntityManagerInterface $entityManager): Cart
+    public function create(CartRepository $cartRepository): void
     {
-        $cart = new Cart();
-        $entityManager->persist($cart);
-        $entityManager->flush();
-
-        return $cart;
+        $cartRepository->add();
     }
 
     /**
      * @Route("carts/{cart}/products/{product}", methods={"PATCH"})
      */
-    public function addProduct(Cart $cart, Product $product, EntityManagerInterface $entityManager): void
+    public function addProduct(Cart $cart, Product $product, CartRepository $cartRepository): void
     {
-        $cart->addProduct($product);
-        $entityManager->flush();
+        $cartRepository->addProduct($cart, $product);
     }
 
     /**
      * @Route("carts/{cart}/products/{product}", methods={"DELETE"})
      */
-    public function removeProduct(Cart $cart, Product $product, EntityManagerInterface $entityManager): void
+    public function removeProduct(Cart $cart, Product $product, CartRepository $cartRepository): void
     {
-        $cart->removeProduct($product);
-        $entityManager->flush();
+        $cartRepository->removeProduct($cart, $product);
     }
 
     /**

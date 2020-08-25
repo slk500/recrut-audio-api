@@ -6,55 +6,37 @@ namespace App\Controller;
 
 use App\Entity\Catalog;
 use App\Entity\Product;
-use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Pagination\ProductCollection;
+use App\Repository\CatalogRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CatalogController extends AbstractController
+final class CatalogController
 {
     /**
      * @Route("catalogs/{catalog}/products/{product}", methods={"PATCH"})
      */
-    public function addProduct(Catalog $catalog, Product $product, EntityManagerInterface $entityManager): void
+    public function addProduct(Catalog $catalog, Product $product, CatalogRepository $catalogRepository): void
     {
-        $catalog->addProduct($product);
-        $entityManager->flush();
+       $catalogRepository->addProduct($catalog, $product);
     }
 
     /**
      * @Route("catalogs/{catalog}/products/{product}", methods={"DELETE"})
      */
-    public function delete(Catalog $catalog, Product $product, EntityManagerInterface $entityManager): void
+    public function removeProduct(Catalog $catalog, Product $product, CatalogRepository $catalogRepository): void
     {
-        $catalog->removeProduct($product);
-        $entityManager->flush();
+        $catalogRepository->removeProduct($catalog, $product);
     }
 
     /**
      * @Route("catalogs/{catalog}/products", methods={"GET"})
      */
-    public function listProducts(Request $request, Catalog $catalog, PaginatorInterface $paginator)
+    public function listProducts(Request $request, Catalog $catalog, ProductCollection $productCollection)
     {
-        $maxPerPage = 3;
-        $pagination = $paginator->paginate(
+        return $productCollection->toArray(
             $catalog->getProducts(),
-            $request->query->getInt('page', 1),
-            $maxPerPage
+            $request->query->getInt('page', 1)
         );
-
-        return [
-            'products' => $pagination,
-            'pagination' =>
-                [
-                    'count' =>
-                        [
-                            'all' => $pagination->getTotalItemCount(),
-                            'current' => $pagination->getCurrentPageNumber(),
-                            'maxPerPage' => $pagination->getItemNumberPerPage()
-                        ]
-                ]
-        ];
     }
 }

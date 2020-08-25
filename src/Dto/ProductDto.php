@@ -6,7 +6,7 @@ namespace App\Dto;
 
 use App\Entity\Product;
 
-class ProductDto
+final class ProductDto
 {
     public string $name;
     public int $price;

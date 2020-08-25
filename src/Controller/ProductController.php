@@ -23,8 +23,8 @@ class ProductController extends AbstractController
 
         $form = $this->createForm(ProductDtoType::class, ProductDto::fromEntity($product));
         $form->submit($data, false);
-
         $productDto = $form->getData();
+
         $product->setName($productDto->name);
         $product->setPrice($productDto->price);
 

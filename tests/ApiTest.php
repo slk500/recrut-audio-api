@@ -53,7 +53,7 @@ class ApiTest extends WebTestCase
     }
 
     /**
-     * @covers CatalogController::delete
+     * @covers CatalogController::removeProduct
      */
     public function test_remove_product_from_the_catalog()
     {
