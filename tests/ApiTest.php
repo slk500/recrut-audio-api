@@ -124,7 +124,7 @@ class ApiTest extends WebTestCase
     }
 
     /**
-     * @covers CatalogController::show
+     * @covers CatalogController::listProducts
      */
     public function test_list_all_products_in_the_catalog_as_a_paginated_list_with_at_most_3_products_per_page()
     {
@@ -170,11 +170,12 @@ class ApiTest extends WebTestCase
         $this->entityManager->persist($catalog);
         $this->entityManager->flush();
 
-        $this->client->request('GET', "/catalogs/{$catalog->getId()}");
+        $this->client->request('GET', "/catalogs/{$catalog->getId()}/products");
 
         $jsonResponse = $this->client->getResponse()->getContent();
         $arrayResponse = json_decode($jsonResponse,true);
-        $this->assertCount(6, $arrayResponse['data']['products']);
+        $this->assertCount(3, $arrayResponse['data']['products']);
+        $this->assertCount(3, $arrayResponse['data']['products']);
     }
 
     /**

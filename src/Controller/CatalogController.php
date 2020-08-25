@@ -7,7 +7,9 @@ namespace App\Controller;
 use App\Entity\Catalog;
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CatalogController extends AbstractController
@@ -31,10 +33,28 @@ class CatalogController extends AbstractController
     }
 
     /**
-     * @Route("catalogs/{catalog}", methods={"GET"})
+     * @Route("catalogs/{catalog}/products", methods={"GET"})
      */
-    public function show(Catalog $catalog): Catalog
+    public function listProducts(Request $request, Catalog $catalog, PaginatorInterface $paginator)
     {
-        return $catalog;
+        $maxPerPage = 3;
+        $pagination = $paginator->paginate(
+            $catalog->getProducts(),
+            $request->query->getInt('page', 1),
+            $maxPerPage
+        );
+
+        return [
+            'products' => $pagination,
+            'pagination' =>
+                [
+                    'count' =>
+                        [
+                            'all' => $pagination->getTotalItemCount(),
+                            'current' => $pagination->getCurrentPageNumber(),
+                            'maxPerPage' => $pagination->getItemNumberPerPage()
+                        ]
+                ]
+        ];
     }
 }
