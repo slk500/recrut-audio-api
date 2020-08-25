@@ -17,7 +17,7 @@ class ProductController extends AbstractController
     /**
      * @Route("products/{id}", methods={"PATCH"})
      */
-    public function update(Request $request, Product $product, EntityManagerInterface $entityManager)
+    public function update(Request $request, Product $product, EntityManagerInterface $entityManager): void
     {
         $data = json_decode($request->getContent(), true);
 
@@ -30,4 +30,24 @@ class ProductController extends AbstractController
 
         $entityManager->flush();
     }
+
+    /**
+     * @Route("products", methods={"POST"})
+     */
+    public function create(Request $request, EntityManagerInterface $entityManager): Product
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $form = $this->createForm(ProductDtoType::class, new ProductDto());
+        $form->submit($data);
+
+        $productDto = $form->getData();
+        $product = $productDto->toEntity();
+
+        $entityManager->persist($product);
+        $entityManager->flush();
+
+        return $product;
+    }
+
 }

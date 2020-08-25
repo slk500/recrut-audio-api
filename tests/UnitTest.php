@@ -19,7 +19,7 @@ class UnitTest extends TestCase
             100
         );
 
-        $catalog->add($product);
+        $catalog->addProduct($product);
 
         $this->assertFalse($catalog->getProducts()->isEmpty());
     }
@@ -32,10 +32,10 @@ class UnitTest extends TestCase
             100
         );
 
-        $catalog->add($product);
+        $catalog->addProduct($product);
         $this->assertFalse($catalog->getProducts()->isEmpty());
 
-        $catalog->remove($product);
+        $catalog->removeProduct($product);
         $this->assertTrue($catalog->getProducts()->isEmpty());
     }
 
@@ -65,11 +65,6 @@ class UnitTest extends TestCase
         $this->assertSame($product->getPrice(), $newProductPrice);
     }
 
-    public function test_list_all_products_in_the_catalog_as_a_paginated_list_with_at_most_3_products_per_page()
-    {
-        $this->markTestSkipped('API');
-    }
-
     public function test_create_a_cart()
     {
         $this->assertInstanceOf(Cart::class, new Cart());
@@ -83,7 +78,7 @@ class UnitTest extends TestCase
             100
         );
 
-        $cart->add($product);
+        $cart->addProduct($product);
 
         $this->assertNotEmpty($cart->getProducts());
     }
@@ -96,10 +91,10 @@ class UnitTest extends TestCase
             100
         );
 
-        $cart->add($product);
+        $cart->addProduct($product);
         $this->assertNotEmpty($cart->getProducts());
 
-        $cart->remove($product);
+        $cart->removeProduct($product);
         $this->assertEmpty($cart->getProducts());
     }
 
@@ -115,8 +110,8 @@ class UnitTest extends TestCase
             200
         );
 
-        $cart->add($productOne);
-        $cart->add($productTwo);
+        $cart->addProduct($productOne);
+        $cart->addProduct($productTwo);
 
         $this->assertCount(2, $cart->getProducts());
         $this->assertContainsOnlyInstancesOf(Product::class, $cart->getProducts());
@@ -131,12 +126,12 @@ class UnitTest extends TestCase
         $productThree = new Product('product 3', 300);
         $productFour = new Product('product 2', 200);
 
-        $cart->add($productOne);
-        $cart->add($productTwo);
-        $cart->add($productThree);
+        $cart->addProduct($productOne);
+        $cart->addProduct($productTwo);
+        $cart->addProduct($productThree);
 
         $this->expectExceptionMessage('cart can contain a max. of 3 products');
-        $cart->add($productFour);
+        $cart->addProduct($productFour);
     }
 
     public function test_cart_should_display_a_total_price_of_all_products_in_it()
@@ -151,8 +146,8 @@ class UnitTest extends TestCase
             200
         );
 
-        $cart->add($productOne);
-        $cart->add($productTwo);
+        $cart->addProduct($productOne);
+        $cart->addProduct($productTwo);
 
         $this->assertEquals($cart->getProductsPrice(), 300);
     }

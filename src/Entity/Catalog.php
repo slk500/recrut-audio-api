@@ -36,12 +36,12 @@ class Catalog
         return $this->id;
     }
 
-    public function add(Product $product): void
+    public function addProduct(Product $product): void
     {
         $this->products[] = $product;
     }
 
-    public function remove(Product $product): void
+    public function removeProduct(Product $product): void
     {
         if (!$this->products->contains($product)) {
             return;

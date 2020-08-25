@@ -32,23 +32,22 @@ class ApiTest extends WebTestCase
     }
 
     /**
-     * @covers CatalogController::create
+     * @covers CatalogController::addProduct
      */
     public function test_add_product_to_the_catalog()
     {
         $catalog = new Catalog();
         $this->entityManager->persist($catalog);
+        $product = new Product(
+            'product 1',
+            100
+        );
+        $this->entityManager->persist($product);
         $this->entityManager->flush();
 
-        $this->client->request('POST', "/catalogs/{$catalog->getId()}/products", [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'CONTENT_TYPE' => 'application/json',
-        ], json_encode([
-            'name'=> 'product 1',
-            'price' => 100
-        ]));
+        $this->client->request('PATCH', "/catalogs/{$catalog->getId()}/products/{$product->getId()}");
 
-        $this->assertSame(201, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
         $this->entityManager->refresh($catalog);
         $this->assertNotEmpty($catalog->getProducts());
     }
@@ -65,7 +64,7 @@ class ApiTest extends WebTestCase
         );
         $this->entityManager->persist($product);
         $this->entityManager->persist($catalog);
-        $catalog->add($product);
+        $catalog->addProduct($product);
         $this->entityManager->flush();
 
         $this->client->request('DELETE', "/catalogs/{$catalog->getId()}/products/{$product->getId()}");
@@ -89,13 +88,10 @@ class ApiTest extends WebTestCase
         $this->entityManager->flush();
 
         $newProductName = 'new product name';
-        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'CONTENT_TYPE' => 'application/json',
-        ], json_encode([
+        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [],
+            json_encode([
             'name'=> $newProductName
         ]));
-
 
         $this->assertSame(204, $this->client->getResponse()->getStatusCode());
 
@@ -116,10 +112,8 @@ class ApiTest extends WebTestCase
         $this->entityManager->flush();
 
         $newProductPrice = 200;
-        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'CONTENT_TYPE' => 'application/json',
-        ], json_encode([
+        $this->client->request('PATCH', "/products/{$product->getId()}", [], [], [],
+            json_encode([
             'price' => $newProductPrice
         ]));
 
@@ -129,11 +123,63 @@ class ApiTest extends WebTestCase
         $this->assertSame($product->getPrice(), $newProductPrice);
     }
 
+    /**
+     * @covers CatalogController::show
+     */
     public function test_list_all_products_in_the_catalog_as_a_paginated_list_with_at_most_3_products_per_page()
     {
-        $this->markTestSkipped('to do');
+        $productOne = new Product(
+            'product 1',
+            100
+        );
+        $productTwo = new Product(
+            'product 2',
+            200
+        );
+        $productThree = new Product(
+            'product 3',
+            300
+        );
+        $productFour = new Product(
+            'product 4',
+            400
+        );
+        $productFive = new Product(
+            'product 5',
+            500
+        );
+        $productSix = new Product(
+            'product 6',
+            600
+        );
+
+        $catalog = new Catalog();
+        $catalog->addProduct($productOne);
+        $catalog->addProduct($productTwo);
+        $catalog->addProduct($productThree);
+        $catalog->addProduct($productFour);
+        $catalog->addProduct($productFive);
+        $catalog->addProduct($productSix);
+
+        $this->entityManager->persist($productOne);
+        $this->entityManager->persist($productTwo);
+        $this->entityManager->persist($productThree);
+        $this->entityManager->persist($productFour);
+        $this->entityManager->persist($productFive);
+        $this->entityManager->persist($productSix);
+        $this->entityManager->persist($catalog);
+        $this->entityManager->flush();
+
+        $this->client->request('GET', "/catalogs/{$catalog->getId()}");
+
+        $jsonResponse = $this->client->getResponse()->getContent();
+        $arrayResponse = json_decode($jsonResponse,true);
+        $this->assertCount(6, $arrayResponse['data']['products']);
     }
 
+    /**
+     * @covers ProductController::update
+     */
     public function test_create_a_cart()
     {
         $this->client->request('POST', "/carts");
@@ -142,6 +188,49 @@ class ApiTest extends WebTestCase
 
         $carts = $this->entityManager->getRepository(Cart::class)->findAll();
         $this->assertNotEmpty($carts);
+    }
+
+    /**
+     * @covers CartController::addProduct
+     */
+    public function test_add_product_to_the_cart()
+    {
+        $cart = new Cart();
+        $product = new Product(
+            'product 1',
+            100
+        );
+
+        $this->entityManager->persist($cart);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        $this->client->request('PATCH', "/carts/{$cart->getId()}/products/{$product->getId()}");
+
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+
+        $this->entityManager->refresh($cart);
+        $this->assertNotEmpty($cart->getProducts());
+    }
+
+    public function test_remove_product_from_the_cart()
+    {
+        $cart = new Cart();
+        $product = new Product(
+            'product 1',
+            100
+        );
+
+        $this->entityManager->persist($cart);
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        $this->client->request('DELETE', "/carts/{$cart->getId()}/products/{$product->getId()}");
+
+        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+
+        $this->entityManager->refresh($cart);
+        $this->assertEmpty($cart->getProducts());
     }
 
     public function test_list_all_products_in_the_cart()
@@ -156,8 +245,8 @@ class ApiTest extends WebTestCase
         );
 
         $cart = new Cart();
-        $cart->add($productOne);
-        $cart->add($productTwo);
+        $cart->addProduct($productOne);
+        $cart->addProduct($productTwo);
 
         $this->entityManager->persist($productOne);
         $this->entityManager->persist($productTwo);
@@ -169,5 +258,33 @@ class ApiTest extends WebTestCase
         $jsonResponse = $this->client->getResponse()->getContent();
         $arrayResponse = json_decode($jsonResponse,true);
         $this->assertCount(2, $arrayResponse['data']['products']);
+    }
+
+    public function test_cart_should_display_a_total_price_of_all_products_in_it()
+    {
+        $productOne = new Product(
+            'product 1',
+            100
+        );
+        $productTwo = new Product(
+            'product 2',
+            200
+        );
+
+        $cart = new Cart();
+        $cart->addProduct($productOne);
+        $cart->addProduct($productTwo);
+
+        $this->entityManager->persist($productOne);
+        $this->entityManager->persist($productTwo);
+        $this->entityManager->persist($cart);
+        $this->entityManager->flush();
+
+        $this->client->request('GET', "/carts/{$cart->getId()}");
+
+        $jsonResponse = $this->client->getResponse()->getContent();
+        $arrayResponse = json_decode($jsonResponse,true);
+        $this->assertCount(2, $arrayResponse['data']['products']);
+        $this->assertEquals(300, $arrayResponse['data']['totalPrice']);
     }
 }

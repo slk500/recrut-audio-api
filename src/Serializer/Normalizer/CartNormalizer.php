@@ -27,7 +27,8 @@ class CartNormalizer implements NormalizerInterface, SerializerAwareInterface
         return [
             'href' => $this->router->generate('app_cart_show', ['id' => $object->getId()]),
             'id'   => $object->getId(),
-            'products' => $this->serializer->normalize($object->getProducts(), $format, $context)
+            'products' => $this->serializer->normalize($object->getProducts(), $format, $context),
+            'totalPrice' => $object->getProductsPrice()
         ];
     }
 

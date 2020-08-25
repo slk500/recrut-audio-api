@@ -31,7 +31,7 @@ class Cart
         $this->products = new ArrayCollection();
     }
 
-    public function add(Product $product): void
+    public function addProduct(Product $product): void
     {
         if(count($this->products) === 3) {
             throw new \Exception('cart can contain a max. of 3 products');
@@ -40,7 +40,7 @@ class Cart
         $this->products[] = $product;
     }
 
-    public function remove(Product $product): void
+    public function removeProduct(Product $product): void
     {
         if(!$this->products->contains($product)){
             return;
