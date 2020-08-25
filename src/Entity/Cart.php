@@ -62,7 +62,7 @@ class Cart
         return $this->id;
     }
 
-    public function getProductsPrice()
+    public function getProductsPrice(): int
     {
         return array_reduce($this->getProducts()->toArray(),
                 fn($carry, $element) => $carry + $element->getPrice(),0);

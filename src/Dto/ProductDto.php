@@ -17,7 +17,7 @@ final class ProductDto
         return new Product($this->name, $this->price);
     }
 
-    public static function fromEntity(Product $product)
+    public static function fromEntity(Product $product): self
     {
         $self = new self();
 
