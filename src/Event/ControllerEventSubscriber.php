@@ -18,7 +18,7 @@ class ControllerEventSubscriber implements EventSubscriberInterface
         $this->serializer = $serializer;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'kernel.view' => [
@@ -29,7 +29,7 @@ class ControllerEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function sendResponse(ViewEvent $event)
+    public function sendResponse(ViewEvent $event): void
     {
         $value = $event->getControllerResult();
 
