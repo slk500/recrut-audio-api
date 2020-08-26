@@ -27,11 +27,10 @@ class ControllerEventSubscriber implements EventSubscriberInterface
 
     public function sendResponse(ViewEvent $event): void
     {
-        $data = $event->getControllerResult();
-
         $method = $event->getRequest()->getMethod();
         $statusCode = $this->getStatusCode($method);
 
+        $data = $event->getControllerResult();
         $normalized = $this->serializer->normalize($data);
 
         $response = new JsonResponse(['data' => $normalized], $statusCode);
