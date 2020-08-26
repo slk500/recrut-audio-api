@@ -45,9 +45,9 @@ class ApiTest extends WebTestCase
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
-        $this->client->request('PATCH', "/catalogs/{$catalog->getId()}/products/{$product->getId()}");
+        $this->client->request('POST', "/catalogs/{$catalog->getId()}/products/{$product->getId()}");
 
-        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(201, $this->client->getResponse()->getStatusCode());
         $this->entityManager->refresh($catalog);
         $this->assertNotEmpty($catalog->getProducts());
     }
@@ -206,9 +206,9 @@ class ApiTest extends WebTestCase
         $this->entityManager->persist($product);
         $this->entityManager->flush();
 
-        $this->client->request('PATCH', "/carts/{$cart->getId()}/products/{$product->getId()}");
+        $this->client->request('POST', "/carts/{$cart->getId()}/products/{$product->getId()}");
 
-        $this->assertSame(204, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(201, $this->client->getResponse()->getStatusCode());
 
         $this->entityManager->refresh($cart);
         $this->assertNotEmpty($cart->getProducts());

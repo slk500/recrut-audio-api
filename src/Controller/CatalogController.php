@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class CatalogController
 {
     /**
-     * @Route("catalogs/{catalog}/products/{product}", methods={"PATCH"})
+     * @Route("catalogs/{catalog}/products/{product}", methods={"POST"})
      */
     public function addProduct(Catalog $catalog, Product $product, CatalogRepository $catalogRepository): void
     {

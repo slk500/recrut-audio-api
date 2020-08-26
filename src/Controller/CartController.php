@@ -20,7 +20,7 @@ final class CartController
     }
 
     /**
-     * @Route("carts/{cart}/products/{product}", methods={"PATCH"})
+     * @Route("carts/{cart}/products/{product}", methods={"POST"})
      */
     public function addProduct(Cart $cart, Product $product, CartRepository $cartRepository): void
     {
