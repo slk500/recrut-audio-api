@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Event;
+namespace App\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,23 +21,18 @@ class ControllerEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'kernel.view' => [
-                [
-                    'sendResponse',
-                ],
-            ],
+            ViewEvent::class => 'sendResponse'
         ];
     }
 
     public function sendResponse(ViewEvent $event): void
     {
-        $value = $event->getControllerResult();
+        $data = $event->getControllerResult();
 
         $method = $event->getRequest()->getMethod();
-
         $statusCode = $this->getStatusCode($method);
 
-        $normalized = $this->serializer->normalize($value);
+        $normalized = $this->serializer->normalize($data);
 
         $response = new JsonResponse(['data' => $normalized], $statusCode);
 

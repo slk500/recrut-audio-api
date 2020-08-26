@@ -214,6 +214,9 @@ class ApiTest extends WebTestCase
         $this->assertNotEmpty($cart->getProducts());
     }
 
+    /**
+     * @covers CartController::removeProduct
+     */
     public function test_remove_product_from_the_cart()
     {
         $cart = new Cart();
@@ -234,6 +237,9 @@ class ApiTest extends WebTestCase
         $this->assertEmpty($cart->getProducts());
     }
 
+    /**
+     * @covers CartController::show
+     */
     public function test_list_all_products_in_the_cart()
     {
         $productOne = new Product(
@@ -261,6 +267,9 @@ class ApiTest extends WebTestCase
         $this->assertCount(2, $arrayResponse['data']['products']);
     }
 
+    /**
+     * @covers CartController::show
+     */
     public function test_cart_should_display_a_total_price_of_all_products_in_it()
     {
         $productOne = new Product(
